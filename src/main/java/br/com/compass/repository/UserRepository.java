@@ -12,7 +12,7 @@ public class UserRepository {
         this.entityManager = entityManager;
     }
 
-    public User post(User user) {
+    public User save(User user) {
         entityManager.getTransaction().begin();
         entityManager.persist(user);
         entityManager.getTransaction().commit();
