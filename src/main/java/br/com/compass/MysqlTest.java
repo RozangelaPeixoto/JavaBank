@@ -17,31 +17,23 @@ public class MysqlTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         try {
-            // Obter o EntityManager
             EntityManager em = Conn.getEntityManager();
- 
-            // Iniciar transação
             em.getTransaction().begin();
- 
-         // Executar uma consulta simples para verificar a conexão
+
             Query query = em.createNativeQuery("SELECT 1");
             List result = query.getResultList();
 
             LocalDate birthDate = LocalDate.parse("25/07/2016", formatter);
             User u1 = new User(null, "Adam", "12548536521", birthDate, "757252274", "adam@gmail.com", "123!@#");
             em.persist(u1);
- 
-            // Verificar o resultado da consulta
+
             if (!result.isEmpty() && result.get(0).equals(1)) {
-                System.out.println("Conexão com o banco de dados foi bem-sucedida!");
+                System.out.println("Conexão com o banco de dados bem-sucedida!");
             } else {
                 System.out.println("Erro ao conectar com o banco de dados.");
             }
- 
-            // Commit da transação
+
             em.getTransaction().commit();
- 
-            // Fechar o EntityManager e o EntityManagerFactory
             
         } catch (Exception e) {
             e.printStackTrace();
