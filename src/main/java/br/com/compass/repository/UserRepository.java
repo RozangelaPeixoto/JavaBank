@@ -4,7 +4,7 @@ import br.com.compass.model.User;
 
 import javax.persistence.EntityManager;
 
-public class UserRepository {
+public class UserRepository{
 
     private final EntityManager entityManager;
 
@@ -13,9 +13,17 @@ public class UserRepository {
     }
 
     public User save(User user) {
-        entityManager.getTransaction().begin();
-        entityManager.persist(user);
-        entityManager.getTransaction().commit();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.persist(user);
+            entityManager.getTransaction().commit();
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
         return user;
+    }
+
+    public User findById(Integer id) {
+        return entityManager.find(User.class, id);
     }
 }

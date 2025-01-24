@@ -9,6 +9,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -48,10 +49,7 @@ public class App {
                     bankMenu(scanner);
                     return;
                 case 2:
-                    // ToDo...
                     openAccount(scanner);
-                    //System.out.println();
-                    //System.out.println("Your account has been opened, use your CPF and password to log in.");
                     break;
                 case 0:
                     running = false;
@@ -112,19 +110,33 @@ public class App {
 
     public static void openAccount(Scanner scanner) {
 
+        System.out.println();
         System.out.println("Please respond the following questions to open your account:");
         System.out.print("Name: ");
         scanner.nextLine();
         String name = scanner.nextLine();
         System.out.print("CPF: ");
         String cpf = scanner.nextLine();
-        System.out.print("Birth Date (dd/mm/yyyy): ");
-        String date = scanner.nextLine();
+
+        LocalDate birthDate = null;
+        boolean formatValid = false;
+        while(!formatValid) {
+            try {
+                System.out.print("Birth Date (dd/mm/yyyy): ");
+                String date = scanner.nextLine();
+                birthDate = LocalDate.parse(date, formatter);
+                formatValid = true;
+            } catch (DateTimeParseException e) {
+                System.out.println("Incorrect format date. Please try again!");
+            }
+        }
+
         System.out.print("Phone number: ");
         String phone = scanner.nextLine();
         System.out.print("Email: ");
         String email = scanner.nextLine();
-        System.out.printf("Select account type:\n" +
+
+        System.out.print("Select account type:\n" +
                 "1 - Checking Account\n" +
                 "2 - Savings Account\n"+
                 "3 - Salary Account\n"+
@@ -137,17 +149,19 @@ public class App {
         }else if (Objects.equals(typeAcc, "4")) {
             System.out.print("CNPJ: ");
             String cnpj = scanner.nextLine();
-        }else{
+        }else if(!Objects.equals(typeAcc, "1") && !Objects.equals(typeAcc, "2")){
             System.out.println("Invalid option! Please try again.");
             return;
         }
+
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
-        LocalDate birthDate = LocalDate.parse(date, formatter);
         User newUser = new User(null, name, cpf, birthDate, phone, email,password);
+        userService.saveUser(newUser);
 
-       // User user = userService.saveUser(newUser,  );
+        System.out.println("Your account has been opened, use your CPF and password to log in.");
+        System.out.println();
     }
     
 }

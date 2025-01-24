@@ -11,10 +11,27 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User saveUser(String nome, String email) {
-        User user = new User();
-        user.setName(nome);
-        user.setEmail(email);
+    public User saveUser(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            throw new IllegalArgumentException("Name is required.");
+        }
+        String regex = "^\\d{11}$";
+        if (user.getCpf() == null || !user.getCpf().matches(regex)) {
+            throw new IllegalArgumentException("Invalid CPF.");
+        }
+        if (user.getPhone() == null || user.getPhone().isBlank()) {
+            throw new IllegalArgumentException("Phone is required.");
+        }
+        if (user.getEmail() == null || !user.getEmail().contains("@")) {
+            throw new IllegalArgumentException("Invalid email.");
+        }
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Password is required.");
+        }
         return userRepository.save(user);
+    }
+
+    public User findUserById(Integer id) {
+        return userRepository.findById(id);
     }
 }
