@@ -3,6 +3,8 @@ package br.com.compass.repository;
 import br.com.compass.model.User;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import java.util.Optional;
 
 public class UserRepository{
 
@@ -25,5 +27,18 @@ public class UserRepository{
 
     public User findById(Integer id) {
         return entityManager.find(User.class, id);
+    }
+
+    public Optional<User> findByCpf(String cpf) {
+        try {
+            TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u WHERE u.cpf = :cpf", User.class);
+            query.setParameter("cpf", cpf);
+            User user = query.getSingleResult();
+            return Optional.of(user);
+        } catch (Exception e) {
+            return Optional.empty();
+        } finally {
+            entityManager.close();
+        }
     }
 }

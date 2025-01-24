@@ -46,7 +46,7 @@ public class App {
 
             switch (option) {
                 case 1:
-                    bankMenu(scanner);
+                    userLogin(scanner);
                     return;
                 case 2:
                     openAccount(scanner);
@@ -162,6 +162,23 @@ public class App {
 
         System.out.println("Your account has been opened, use your CPF and password to log in.");
         System.out.println();
+    }
+
+    private static void userLogin(Scanner scanner) {
+
+        System.out.println();
+        System.out.println("========= Bank Login ========");
+        System.out.print("Enter your cpf: ");
+        scanner.nextLine();
+        String cpf = scanner.nextLine();
+        System.out.print("Enter your password: ");
+        String password = scanner.nextLine();
+        if(userService.validateLogin(cpf,password)){
+            bankMenu(scanner);
+        }else{
+            System.out.println();
+            mainMenu(scanner);
+        }
     }
     
 }

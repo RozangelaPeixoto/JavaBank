@@ -3,6 +3,8 @@ package br.com.compass.service;
 import br.com.compass.model.User;
 import br.com.compass.repository.UserRepository;
 
+import java.util.Optional;
+
 public class UserService {
 
     private final UserRepository userRepository;
@@ -19,7 +21,7 @@ public class UserService {
         if (user.getCpf() == null || !user.getCpf().matches(regex)) {
             throw new IllegalArgumentException("Invalid CPF.");
         }
-        if (user.getPhone() == null || user.getPhone().isBlank()) {
+        if (user.getPhone() == null || user.getPhone().matches(regex)) {
             throw new IllegalArgumentException("Phone is required.");
         }
         if (user.getEmail() == null || !user.getEmail().contains("@")) {
@@ -33,5 +35,27 @@ public class UserService {
 
     public User findUserById(Integer id) {
         return userRepository.findById(id);
+    }
+
+    public User findUserByCpf(String cpf) {
+        Optional<User> userOptional = userRepository.findByCpf(cpf);
+
+        return userOptional.orElse(null);
+    }
+
+    public boolean validateLogin(String cpf, String password){
+        User user = findUserByCpf(cpf);
+
+        if(user == null){
+            System.out.println("This CPF is not in our database.");
+            return false;
+        }
+        if(!password.equals(user.getPassword())){
+            System.out.println("Invalid password.");
+            return false;
+        }
+        System.out.println();
+        System.out.println("Welcome " + user.getName());
+        return true;
     }
 }
