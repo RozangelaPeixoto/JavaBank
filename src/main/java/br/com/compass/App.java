@@ -1,11 +1,27 @@
 package br.com.compass;
 
+import br.com.compass.model.User;
+import br.com.compass.repository.UserRepository;
+import br.com.compass.service.UserService;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class App {
-	
+
+    static EntityManagerFactory factory = Persistence.createEntityManagerFactory("java-bank");
+    static EntityManager entityManager = factory.createEntityManager();
+    static UserRepository userRepository = new UserRepository(entityManager);
+    static UserService userService = new UserService(userRepository);
+    static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     
     public static void main(String[] args) {
+
         Scanner scanner = new Scanner(System.in);
 
         mainMenu(scanner);
@@ -33,7 +49,9 @@ public class App {
                     return;
                 case 2:
                     // ToDo...
-                    System.out.println("Account Opening.");
+                    openAccount(scanner);
+                    //System.out.println();
+                    //System.out.println("Your account has been opened, use your CPF and password to log in.");
                     break;
                 case 0:
                     running = false;
@@ -90,6 +108,46 @@ public class App {
                     System.out.println("Invalid option! Please try again.");
             }
         }
+    }
+
+    public static void openAccount(Scanner scanner) {
+
+        System.out.println("Please respond the following questions to open your account:");
+        System.out.print("Name: ");
+        scanner.nextLine();
+        String name = scanner.nextLine();
+        System.out.print("CPF: ");
+        String cpf = scanner.nextLine();
+        System.out.print("Birth Date (dd/mm/yyyy): ");
+        String date = scanner.nextLine();
+        System.out.print("Phone number: ");
+        String phone = scanner.nextLine();
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        System.out.printf("Select account type:\n" +
+                "1 - Checking Account\n" +
+                "2 - Savings Account\n"+
+                "3 - Salary Account\n"+
+                "4 - Business Account\n");
+        System.out.print("Enter the number: ");
+        String typeAcc = scanner.nextLine();
+        if(Objects.equals(typeAcc, "3")) {
+            System.out.print("Company: ");
+            String company = scanner.nextLine();
+        }else if (Objects.equals(typeAcc, "4")) {
+            System.out.print("CNPJ: ");
+            String cnpj = scanner.nextLine();
+        }else{
+            System.out.println("Invalid option! Please try again.");
+            return;
+        }
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+
+        LocalDate birthDate = LocalDate.parse(date, formatter);
+        User newUser = new User(null, name, cpf, birthDate, phone, email,password);
+
+       // User user = userService.saveUser(newUser,  );
     }
     
 }
