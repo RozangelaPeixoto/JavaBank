@@ -28,6 +28,17 @@ public class AccountRepository {
         return account;
     }
 
+    public Optional<Account> findByUserId(Integer id) {
+        try {
+            TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a WHERE a.holder.id = :id", Account.class);
+            query.setParameter("id", id);
+            Account account = query.getSingleResult();
+            return Optional.of(account);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
     public void deposit(Double amount, Integer id) {
 
         try{
@@ -43,15 +54,20 @@ public class AccountRepository {
         }
     }
 
-    public Optional<Account> findByUserId(Integer id) {
-        try {
-            TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a WHERE a.holder.id = :id", Account.class);
-            query.setParameter("id", id);
-            Account account = query.getSingleResult();
-            return Optional.of(account);
-        } catch (Exception e) {
-            return Optional.empty();
+    public void withdraw(Double amount, Integer id) {
+
+        try{
+            entityManager.getTransaction().begin();
+            Account account = entityManager.find(Account.class, id);
+            account.withdraw(amount);
+            Session.setUserAccount(account);
+            entityManager.getTransaction().commit();
+        }catch(Exception e){
+            entityManager.getTransaction().rollback();
+            System.out.println("Unexpected error while trying to save to database");
+            throw e;
         }
+
     }
 
     public Double balance(Integer id) {

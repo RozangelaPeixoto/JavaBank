@@ -29,18 +29,36 @@ public class AccountService {
         try{
             amount = Double.parseDouble(value);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid number");
+            return null;
         }
         return amount;
     }
 
     public void depositValue(String value) {
-        double amount = convertValue(value);
-        Account account = Session.getUserAccount();
+        Double amount = convertValue(value);
+        if(amount == null){
+            throw new IllegalArgumentException("Invalid number");
+        }
         if(amount <= 0){
             throw new IllegalArgumentException("Deposit amount must be greater than zero.");
         }
+        Account account = Session.getUserAccount();
         accountRepository.deposit(amount, account.getId());
+    }
+
+    public void withdrawValue(String value){
+        Double amount = convertValue(value);
+        if(amount == null){
+            throw new IllegalArgumentException("Invalid number");
+        }
+        if(amount <= 0){
+            throw new IllegalArgumentException("Withdraw amount must be greater than zero.");
+        }
+        Account account = Session.getUserAccount();
+        if (amount > account.getBalance()) {
+            throw new IllegalArgumentException("Insufficient balance to make withdrawal.");
+        }
+        accountRepository.withdraw(amount, account.getId());
     }
 
     public Double checkBalance() {

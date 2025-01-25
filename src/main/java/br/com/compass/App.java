@@ -84,8 +84,7 @@ public class App {
                     deposit(scanner);
                     break;
                 case 2:
-                    // ToDo...
-                    System.out.println("Withdraw.");
+                    withdraw(scanner);
                     break;
                 case 3:
                     showBalance();
@@ -210,6 +209,25 @@ public class App {
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private static void withdraw(Scanner scanner) {
+
+        System.out.println();
+        System.out.println("========== Withdraw =========");
+        scanner.nextLine();
+        System.out.println("Balance: " + accountService.checkBalance());
+        System.out.print("Enter the amount to withdraw: ");
+        String value = scanner.nextLine();
+        try{
+
+            accountService.withdrawValue(value);
+            System.out.println("Balance: " + accountService.checkBalance());
+            System.out.println();
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     private static void showBalance() {

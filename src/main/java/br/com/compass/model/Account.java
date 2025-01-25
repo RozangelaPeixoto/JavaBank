@@ -58,12 +58,6 @@ public class Account implements Serializable {
     }
 
     public void withdraw(double value){
-        if (value <= 0) {
-            throw new IllegalArgumentException("The withdrawal amount must be greater than zero.");
-        }
-        if (value > balance) {
-            throw new IllegalArgumentException("Insufficient balance to make withdrawal.");
-        }
         balance -= value;
         //registrar nas transaçoes
     }
@@ -87,6 +81,8 @@ public class Account implements Serializable {
         //registrar nas transaçoes
     }
 
+    //public List<Transation> bankStatement(){return transactions}
+
     @Override
     public String toString() {
         return "Account{" +
@@ -96,8 +92,5 @@ public class Account implements Serializable {
                 ", holder=" + holder +
                 '}';
     }
-
-    //public List<Transation> bankStatement(){return transactions}
-
 
 }
