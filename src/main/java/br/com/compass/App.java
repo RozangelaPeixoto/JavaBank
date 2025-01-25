@@ -81,16 +81,14 @@ public class App {
 
             switch (option) {
                 case 1:
-                    // ToDo...
-                    System.out.println("Deposit.");
+                    deposit(scanner);
                     break;
                 case 2:
                     // ToDo...
                     System.out.println("Withdraw.");
                     break;
                 case 3:
-                    // ToDo...
-                    System.out.println("Check Balance.");
+                    showBalance();
                     break;
                 case 4:
                     // ToDo...
@@ -197,5 +195,28 @@ public class App {
             mainMenu(scanner);
         }
     }
-    
+
+    private static void deposit(Scanner scanner) {
+
+        System.out.println();
+        System.out.println("========== Deposit ==========");
+        scanner.nextLine();
+        System.out.print("Enter the amount to deposit: ");
+        String value = scanner.nextLine();
+        try{
+            accountService.depositValue(value);
+            System.out.println("Balance: " + accountService.checkBalance());
+
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private static void showBalance() {
+        System.out.println();
+        System.out.println("========== Balance ==========");
+        System.out.println("Balance: " + accountService.checkBalance());
+        System.out.println();
+    }
+
 }

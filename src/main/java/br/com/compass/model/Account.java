@@ -12,8 +12,6 @@ public class Account implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final AtomicInteger accountCounter = new AtomicInteger(1);
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -28,7 +26,7 @@ public class Account implements Serializable {
 
     public Account(Integer id, User holder) {
         this.id = id;
-        this.accNumber = generateAccNumber();
+        this.accNumber = null;
         this.balance = 0.0;
         this.holder = holder;
     }
@@ -37,9 +35,9 @@ public class Account implements Serializable {
 
     }
 
-    private String generateAccNumber() {
-        int uniqueNumber = accountCounter.getAndIncrement();
-        return String.format("%06d", uniqueNumber);
+    @PostPersist
+    private void generateAccNumber() {
+        this.accNumber = String.format("%06d", id);
     }
 
     public Integer getId() {
@@ -55,9 +53,6 @@ public class Account implements Serializable {
     }
 
     public void deposit(double value){
-        if (value <= 0) {
-            throw new IllegalArgumentException("Deposit amount must be greater than zero.");
-        }
         balance += value;
         //registrar nas transaçoes
     }
@@ -73,7 +68,7 @@ public class Account implements Serializable {
         //registrar nas transaçoes
     }
 
-    public Double checkBalance() {
+    public Double getBalance() {
         return balance;
     }
 
