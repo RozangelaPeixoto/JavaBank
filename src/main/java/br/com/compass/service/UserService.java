@@ -43,19 +43,4 @@ public class UserService {
         return userOptional.orElse(null);
     }
 
-    public User validateLogin(String cpf, String password){
-        User user = findUserByCpf(cpf);
-
-        if(user == null){
-            System.out.println("This CPF is not in our database.");
-            return null;
-        }
-        if(!password.equals(user.getPassword())){
-            System.out.println("Invalid password.");
-            return null;
-        }
-        System.out.println();
-        System.out.println("Welcome " + user.getName());
-        return user;
-    }
 }

@@ -4,15 +4,14 @@ import br.com.compass.model.*;
 import br.com.compass.repository.AccountRepository;
 import br.com.compass.repository.UserRepository;
 import br.com.compass.service.AccountService;
+import br.com.compass.service.SessionService;
 import br.com.compass.service.UserService;
 import br.com.compass.util.Conn;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 import java.util.Scanner;
 
 public class App {
@@ -22,6 +21,7 @@ public class App {
     static AccountRepository accountRepository = new AccountRepository(entityManager);
     static UserService userService = new UserService(userRepository);
     static AccountService accountService = new AccountService(accountRepository);
+    static SessionService sessionService = new SessionService(userRepository, accountRepository);
     static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     
     public static void main(String[] args) {
@@ -177,10 +177,7 @@ public class App {
         System.out.print("Enter your password: ");
         String password = scanner.nextLine();
 
-        User logedUser = userService.validateLogin(cpf,password);
-        if(logedUser != null){
-            Account returnedAcc = accountService.findAccountByUser(logedUser.getId());
-            System.out.println(returnedAcc);
+        if(sessionService.validateLogin(cpf,password)){
             bankMenu(scanner);
         }else{
             System.out.println();
