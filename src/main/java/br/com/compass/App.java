@@ -1,6 +1,7 @@
 package br.com.compass;
 
 import br.com.compass.model.User;
+import br.com.compass.model.enums.AccountType;
 import br.com.compass.repository.UserRepository;
 import br.com.compass.service.UserService;
 
@@ -135,30 +136,33 @@ public class App {
         String phone = scanner.nextLine();
         System.out.print("Email: ");
         String email = scanner.nextLine();
-
-        System.out.print("Select account type:\n" +
-                "1 - Checking Account\n" +
-                "2 - Savings Account\n"+
-                "3 - Salary Account\n"+
-                "4 - Business Account\n");
-        System.out.print("Enter the number: ");
-        String typeAcc = scanner.nextLine();
-        if(Objects.equals(typeAcc, "3")) {
-            System.out.print("Company: ");
-            String company = scanner.nextLine();
-        }else if (Objects.equals(typeAcc, "4")) {
-            System.out.print("CNPJ: ");
-            String cnpj = scanner.nextLine();
-        }else if(!Objects.equals(typeAcc, "1") && !Objects.equals(typeAcc, "2")){
-            System.out.println("Invalid option! Please try again.");
-            return;
-        }
-
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
-        User newUser = new User(null, name, cpf, birthDate, phone, email,password);
+        User newUser = new User(null, name, cpf, birthDate, phone, email, password);
         User user = userService.saveUser(newUser);
+
+        System.out.print("Select account type:\n" +
+                "1 - Business Account\n" +
+                "2 - Checking Account\n"+
+                "3 - Salary Account\n"+
+                "4 - Savings Account\n");
+        System.out.print("Enter the number: ");
+        String stringType = scanner.nextLine();
+
+        AccountType accType;
+        if(Objects.equals(stringType, "1")){
+            accType = AccountType.BUSINESS;
+        }else if(Objects.equals(stringType, "2")){
+            accType = AccountType.CHECKING;
+        }else if(Objects.equals(stringType, "3")) {
+            accType = AccountType.SALARY;
+        }else if (Objects.equals(stringType, "4")) {
+            accType = AccountType.SAVINGS;
+        }else {
+            System.out.println("Invalid option! Please try again.");
+            return;
+        }
 
         System.out.println("Your account has been opened, use your CPF and password to log in.");
         System.out.println();

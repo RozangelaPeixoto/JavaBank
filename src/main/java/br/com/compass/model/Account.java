@@ -1,12 +1,14 @@
 package br.com.compass.model;
 
+import br.com.compass.model.enums.AccountType;
+
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Account implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -14,10 +16,10 @@ public abstract class Account implements Serializable {
     private static final AtomicInteger accountCounter = new AtomicInteger(1);
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "acc_seq")
-    @SequenceGenerator(name = "acc_seq", sequenceName = "acc_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String accNumber;
+    private AccountType accountType;
     private Double balance;
 
     @ManyToOne(optional = false)
