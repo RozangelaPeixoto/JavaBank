@@ -1,15 +1,19 @@
 package br.com.compass.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.*;
 
 @Entity
 public class User implements Serializable{
-	private static final long serialVersionUID = 1L;
-	
-	
+	@Serial
+    private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -20,7 +24,10 @@ public class User implements Serializable{
     private String phone;
     private String email;
     private String password;
-    
+
+    @OneToMany(mappedBy = "holder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Account> accounts;
+
     public User() {
     }
 
@@ -32,6 +39,7 @@ public class User implements Serializable{
         this.phone = phone;
         this.email = email;
         this.password = password;
+        this.accounts = new ArrayList<>();
     }
 
     public Integer getId() {
@@ -80,6 +88,20 @@ public class User implements Serializable{
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Account> getAccounts() { return accounts; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(cpf, user.cpf);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(cpf);
     }
 
     @Override

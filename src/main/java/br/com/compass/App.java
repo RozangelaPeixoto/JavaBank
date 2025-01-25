@@ -158,7 +158,7 @@ public class App {
         String password = scanner.nextLine();
 
         User newUser = new User(null, name, cpf, birthDate, phone, email,password);
-        userService.saveUser(newUser);
+        User user = userService.saveUser(newUser);
 
         System.out.println("Your account has been opened, use your CPF and password to log in.");
         System.out.println();
@@ -173,6 +173,7 @@ public class App {
         String cpf = scanner.nextLine();
         System.out.print("Enter your password: ");
         String password = scanner.nextLine();
+
         if(userService.validateLogin(cpf,password)){
             bankMenu(scanner);
         }else{

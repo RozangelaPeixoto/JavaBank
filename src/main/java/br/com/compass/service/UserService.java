@@ -21,7 +21,7 @@ public class UserService {
         if (user.getCpf() == null || !user.getCpf().matches(regex)) {
             throw new IllegalArgumentException("Invalid CPF.");
         }
-        if (user.getPhone() == null || user.getPhone().matches(regex)) {
+        if (user.getPhone() == null || !user.getPhone().matches(regex)) {
             throw new IllegalArgumentException("Phone is required.");
         }
         if (user.getEmail() == null || !user.getEmail().contains("@")) {
