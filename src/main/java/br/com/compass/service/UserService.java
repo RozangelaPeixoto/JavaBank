@@ -13,23 +13,36 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User saveUser(User user) {
+    public boolean isvalideUser(User user) {
+        if(findUserByCpf(user.getCpf()) != null){
+            System.out.println("User already has an account.\n");
+            return false;
+        }
         if (user.getName() == null || user.getName().isBlank()) {
-            throw new IllegalArgumentException("Name is required.");
+            System.out.println("Name is required.\n");
+            return false;
         }
         String regex = "^\\d{11}$";
         if (user.getCpf() == null || !user.getCpf().matches(regex)) {
-            throw new IllegalArgumentException("Invalid CPF.");
+            System.out.println("Invalid CPF.\n");
+            return false;
         }
         if (user.getPhone() == null || !user.getPhone().matches(regex)) {
-            throw new IllegalArgumentException("Phone is required.");
+            System.out.println("Phone is required.\n");
+            return false;
         }
         if (user.getEmail() == null || !user.getEmail().contains("@")) {
-            throw new IllegalArgumentException("Invalid email.");
+            System.out.println("Invalid email.\n");
+            return false;
         }
         if (user.getPassword() == null || user.getPassword().isBlank()) {
-            throw new IllegalArgumentException("Password is required.");
+            System.out.println("Password is required.\n");
+            return false;
         }
+        return true;
+    }
+
+    public User saveUser(User user){
         return userRepository.save(user);
     }
 

@@ -1,11 +1,8 @@
 package br.com.compass.service;
 
 import br.com.compass.model.Account;
-import br.com.compass.model.User;
 import br.com.compass.repository.AccountRepository;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class AccountService {

@@ -142,28 +142,39 @@ public class App {
         String password = scanner.nextLine();
 
         User newUser = new User(null, name, cpf, birthDate, phone, email, password);
-        User user = userService.saveUser(newUser);
+        boolean isValidUser = userService.isvalideUser(newUser);
+        if(!isValidUser){
+            return;
+        }
 
-        System.out.print("""
-                Select account type:
-                1 - Business Account
-                2 - Checking Account
-                3 - Salary Account
-                4 - Savings Account
-                """);
-        System.out.print("Enter the number: ");
-        String stringType = scanner.nextLine();
+        Account newAccount = null;
+        while(newAccount == null) {
+            System.out.print("""
+                    Select account type:
+                    1 - Business Account
+                    2 - Checking Account
+                    3 - Salary Account
+                    4 - Savings Account
+                    """);
+            System.out.print("Enter the number: ");
+            String stringType = scanner.nextLine();
+            newAccount = switch (stringType) {
+                case "1" -> new BusinessAccount(null, newUser);
+                case "2" -> new CheckingAccount(null, newUser);
+                case "3" -> new SalaryAccount(null, newUser);
+                case "4" -> new SavingsAccount(null, newUser);
+                default -> {
+                    System.out.println("Invalid option. Please try again!");
+                    System.out.println();
+                    yield null;
+                }
+            };
+        }
 
-        Account newAccount = switch (stringType) {
-            case "1" -> new BusinessAccount(null, user);
-            case "2" -> new CheckingAccount(null, user);
-            case "3" -> new SalaryAccount(null, user);
-            case "4" -> new SavingsAccount(null,user);
-            default -> throw new IllegalArgumentException("Invalid type!");
-        };
-        Account account = accountService.saveAccount(newAccount);
+        User recovedUser = userService.saveUser(newUser);
+        accountService.saveAccount(newAccount);
 
-        System.out.println("Your account has been opened, use your CPF and password to log in.");
+        System.out.println("Your account has been created, use your CPF and password to log in.");
         System.out.println();
     }
 
@@ -178,6 +189,8 @@ public class App {
         String password = scanner.nextLine();
 
         if(sessionService.validateLogin(cpf,password)){
+            System.out.println();
+            System.out.println("Welcome, " + Session.getLoggedUser().getName());
             bankMenu(scanner);
         }else{
             System.out.println();
