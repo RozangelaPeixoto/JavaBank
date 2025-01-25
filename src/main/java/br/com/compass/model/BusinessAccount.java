@@ -1,10 +1,15 @@
 package br.com.compass.model;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
+@DiscriminatorValue("1")
 public class BusinessAccount extends Account{
 
-    public BusinessAccount(Integer id, Double balance, User holder) { super(id, balance, holder); }
+    public BusinessAccount() { super(); }
+    public BusinessAccount(Integer id, User holder) {
+        super(id, holder);
+    }
 
 }

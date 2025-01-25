@@ -5,6 +5,7 @@ import br.com.compass.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.util.List;
 import java.util.Optional;
 
 public class AccountRepository {
@@ -26,18 +27,15 @@ public class AccountRepository {
         return account;
     }
 
-    /*
-    public Optional<Account> findByUser(User user) {
+    public Optional<Account> findByUserId(Integer id) {
         try {
-            TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u WHERE u.cpf = :cpf", User.class);
-            query.setParameter("cpf", cpf);
-            User user = query.getSingleResult();
-            return Optional.of(user);
+            TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a WHERE a.holder.id = :id", Account.class);
+            query.setParameter("id", id);
+            Account account = query.getSingleResult();
+            return Optional.of(account);
         } catch (Exception e) {
             return Optional.empty();
-        } finally {
-            entityManager.close();
         }
-    }*/
+    }
 
 }

@@ -1,7 +1,5 @@
 package br.com.compass.model;
 
-import br.com.compass.model.enums.AccountType;
-
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
@@ -9,7 +7,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class Account implements Serializable {
+@DiscriminatorColumn(name = "id_type", discriminatorType = DiscriminatorType.INTEGER)
+public class Account implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -18,19 +17,24 @@ public abstract class Account implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(name = "acc_number")
     private String accNumber;
-    private AccountType accountType;
     private Double balance;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_user", nullable = false)
     private User holder;
 
-    public Account(Integer id, Double balance, User holder) {
+    public Account(Integer id, User holder) {
         this.id = id;
         this.accNumber = generateAccNumber();
-        this.balance = balance;
+        this.balance = 0.0;
         this.holder = holder;
+    }
+
+    public Account() {
+
     }
 
     private String generateAccNumber() {
@@ -86,6 +90,16 @@ public abstract class Account implements Serializable {
         balance -= value;
         account.deposit(value);
         //registrar nas transaçoes
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", accNumber='" + accNumber + '\'' +
+                ", balance=" + balance +
+                ", holder=" + holder +
+                '}';
     }
 
     //public List<Transation> bankStatement(){return transactions}

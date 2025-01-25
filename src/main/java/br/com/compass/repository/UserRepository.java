@@ -37,8 +37,6 @@ public class UserRepository{
             return Optional.of(user);
         } catch (Exception e) {
             return Optional.empty();
-        } finally {
-            entityManager.close();
         }
     }
 }

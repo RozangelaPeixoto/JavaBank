@@ -1,25 +1,27 @@
 package br.com.compass;
 
-import br.com.compass.model.User;
-import br.com.compass.model.enums.AccountType;
+import br.com.compass.model.*;
+import br.com.compass.repository.AccountRepository;
 import br.com.compass.repository.UserRepository;
+import br.com.compass.service.AccountService;
 import br.com.compass.service.UserService;
+import br.com.compass.util.Conn;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Objects;
+import java.util.List;
 import java.util.Scanner;
 
 public class App {
 
-    static EntityManagerFactory factory = Persistence.createEntityManagerFactory("java-bank");
-    static EntityManager entityManager = factory.createEntityManager();
+    static EntityManager entityManager = Conn.getEntityManager();
     static UserRepository userRepository = new UserRepository(entityManager);
+    static AccountRepository accountRepository = new AccountRepository(entityManager);
     static UserService userService = new UserService(userRepository);
+    static AccountService accountService = new AccountService(accountRepository);
     static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     
     public static void main(String[] args) {
@@ -142,27 +144,24 @@ public class App {
         User newUser = new User(null, name, cpf, birthDate, phone, email, password);
         User user = userService.saveUser(newUser);
 
-        System.out.print("Select account type:\n" +
-                "1 - Business Account\n" +
-                "2 - Checking Account\n"+
-                "3 - Salary Account\n"+
-                "4 - Savings Account\n");
+        System.out.print("""
+                Select account type:
+                1 - Business Account
+                2 - Checking Account
+                3 - Salary Account
+                4 - Savings Account
+                """);
         System.out.print("Enter the number: ");
         String stringType = scanner.nextLine();
 
-        AccountType accType;
-        if(Objects.equals(stringType, "1")){
-            accType = AccountType.BUSINESS;
-        }else if(Objects.equals(stringType, "2")){
-            accType = AccountType.CHECKING;
-        }else if(Objects.equals(stringType, "3")) {
-            accType = AccountType.SALARY;
-        }else if (Objects.equals(stringType, "4")) {
-            accType = AccountType.SAVINGS;
-        }else {
-            System.out.println("Invalid option! Please try again.");
-            return;
-        }
+        Account newAccount = switch (stringType) {
+            case "1" -> new BusinessAccount(null, user);
+            case "2" -> new CheckingAccount(null, user);
+            case "3" -> new SalaryAccount(null, user);
+            case "4" -> new SavingsAccount(null,user);
+            default -> throw new IllegalArgumentException("Invalid type!");
+        };
+        Account account = accountService.saveAccount(newAccount);
 
         System.out.println("Your account has been opened, use your CPF and password to log in.");
         System.out.println();
@@ -178,7 +177,10 @@ public class App {
         System.out.print("Enter your password: ");
         String password = scanner.nextLine();
 
-        if(userService.validateLogin(cpf,password)){
+        User logedUser = userService.validateLogin(cpf,password);
+        if(logedUser != null){
+            Account returnedAcc = accountService.findAccountByUser(logedUser.getId());
+            System.out.println(returnedAcc);
             bankMenu(scanner);
         }else{
             System.out.println();
