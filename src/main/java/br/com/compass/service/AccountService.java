@@ -18,10 +18,9 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
-    public Account findAccountByUser(Integer id){
-        Optional<Account> optionalAccount = accountRepository.findByUserId(id);
-        return optionalAccount.orElse(null);
-
+    public Account findAccountByAccountNumber(String accNumber) {
+        Optional<Account> accountOptional = accountRepository.findByAccountNumber(accNumber);
+        return accountOptional.orElse(null);
     }
 
     public Double convertValue(String value) {
@@ -37,10 +36,10 @@ public class AccountService {
     public void depositValue(String value) {
         Double amount = convertValue(value);
         if(amount == null){
-            throw new IllegalArgumentException("Invalid number");
+            throw new IllegalArgumentException("Invalid number.");
         }
         if(amount <= 0){
-            throw new IllegalArgumentException("Deposit amount must be greater than zero.");
+            throw new IllegalArgumentException("The amount must be greater than zero.");
         }
         Account account = Session.getUserAccount();
         accountRepository.deposit(amount, account.getId());
@@ -49,14 +48,14 @@ public class AccountService {
     public void withdrawValue(String value){
         Double amount = convertValue(value);
         if(amount == null){
-            throw new IllegalArgumentException("Invalid number");
+            throw new IllegalArgumentException("Invalid number.");
         }
         if(amount <= 0){
-            throw new IllegalArgumentException("Withdraw amount must be greater than zero.");
+            throw new IllegalArgumentException("The amount must be greater than zero.");
         }
         Account account = Session.getUserAccount();
         if (amount > account.getBalance()) {
-            throw new IllegalArgumentException("Insufficient balance to make withdrawal.");
+            throw new IllegalArgumentException("Insufficient balance.");
         }
         accountRepository.withdraw(amount, account.getId());
     }
@@ -64,5 +63,25 @@ public class AccountService {
     public Double checkBalance() {
         Account account = Session.getUserAccount();
         return accountRepository.balance(account.getId());
+    }
+
+    public void transferValue(String value, String accNumber){
+        Double amount = convertValue(value);
+        if(amount == null){
+            throw new IllegalArgumentException("Invalid number.");
+        }
+        if(amount <= 0){
+            throw new IllegalArgumentException("The amount must be greater than zero.");
+        }
+        Account account = Session.getUserAccount();
+        if (amount > account.getBalance()) {
+            throw new IllegalArgumentException("Insufficient balance.");
+        }
+        Account targetAccount = findAccountByAccountNumber(accNumber);
+        if(targetAccount == null){
+            throw new IllegalArgumentException("Target account not found.");
+        }
+        accountRepository.transfer(targetAccount.getId(), amount, account.getId());
+
     }
 }

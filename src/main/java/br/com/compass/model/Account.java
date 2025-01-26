@@ -67,15 +67,6 @@ public class Account implements Serializable {
     }
 
     public void transfer(Account account, double value){
-        if (account == null) {
-            throw new IllegalArgumentException("Invalid destination account.");
-        }
-        if (value <= 0) {
-            throw new IllegalArgumentException("The transfer amount must be greater than zero.");
-        }
-        if (value > balance) {
-            throw new IllegalArgumentException("Insufficient balance.");
-        }
         balance -= value;
         account.deposit(value);
         //registrar nas transaçoes

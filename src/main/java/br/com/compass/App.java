@@ -90,8 +90,7 @@ public class App {
                     showBalance();
                     break;
                 case 4:
-                    // ToDo...
-                    System.out.println("Transfer.");
+                    transfer(scanner);
                     break;
                 case 5:
                     // ToDo...
@@ -220,7 +219,6 @@ public class App {
         System.out.print("Enter the amount to withdraw: ");
         String value = scanner.nextLine();
         try{
-
             accountService.withdrawValue(value);
             System.out.println("Balance: " + accountService.checkBalance());
             System.out.println();
@@ -237,4 +235,23 @@ public class App {
         System.out.println();
     }
 
+    private static void transfer(Scanner scanner) {
+
+        System.out.println();
+        System.out.println("========== Transfer =========");
+        scanner.nextLine();
+        System.out.println("Balance: " + accountService.checkBalance());
+        System.out.print("Enter the amount to transfer: ");
+        String value = scanner.nextLine();
+        System.out.print("Enter the account number to transfer: ");
+        String accNumber = scanner.nextLine();
+        try{
+            accountService.transferValue(value, accNumber);
+            System.out.println("Balance: " + accountService.checkBalance());
+            System.out.println();
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
 }
