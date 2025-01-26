@@ -25,6 +25,7 @@ public class Account implements Serializable {
     @JoinColumn(name = "id_user", nullable = false)
     private User holder;
 
+    @OneToMany(mappedBy = "account")
     private List<Transaction> transactions;
 
     public Account(Integer id, User holder) {

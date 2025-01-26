@@ -2,27 +2,38 @@ package br.com.compass.model;
 
 import br.com.compass.model.enums.TransactionType;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
 public class Transaction {
 
-    private Integer id;
+    @EmbeddedId
+    private TransactionId id;
+
+    @Enumerated(EnumType.STRING)
     private TransactionType type;
     private Double amount;
+
+    @Column(name = "date_time")
     private LocalDateTime dateTime;
+
+    @ManyToOne
+    @MapsId("accountId")
+    @JoinColumn(name = "id_acc")
     private Account account;
 
     public Transaction() {}
 
-    public Transaction(Integer id, TransactionType type, Double amount, Account account) {
+    public Transaction(TransactionId id, TransactionType type, Double amount, LocalDateTime dateTime, Account account) {
         this.id = id;
         this.type = type;
         this.amount = amount;
-        this.dateTime = LocalDateTime.now();
+        this.dateTime = dateTime;
         this.account = account;
     }
 
-    public Integer getId() {
+    public TransactionId getId() {
         return id;
     }
 
