@@ -3,7 +3,8 @@ package br.com.compass.model;
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -24,11 +25,14 @@ public class Account implements Serializable {
     @JoinColumn(name = "id_user", nullable = false)
     private User holder;
 
+    private List<Transaction> transactions;
+
     public Account(Integer id, User holder) {
         this.id = id;
         this.accNumber = null;
         this.balance = 0.0;
         this.holder = holder;
+        this.transactions = new ArrayList<>();
     }
 
     public Account() {
@@ -72,7 +76,9 @@ public class Account implements Serializable {
         //registrar nas transaçoes
     }
 
-    //public List<Transation> bankStatement(){return transactions}
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
 
     @Override
     public String toString() {
