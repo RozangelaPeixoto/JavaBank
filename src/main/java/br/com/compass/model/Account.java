@@ -1,14 +1,17 @@
 package br.com.compass.model;
 
+import br.com.compass.model.enums.TransactionType;
+
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "id_type", discriminatorType = DiscriminatorType.INTEGER)
+@DiscriminatorColumn(name = "id_type", discriminatorType = DiscriminatorType.STRING)
 public class Account implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -59,27 +62,30 @@ public class Account implements Serializable {
 
     public void deposit(double value){
         balance += value;
-        //registrar nas transaçoes
     }
 
     public void withdraw(double value){
         balance -= value;
-        //registrar nas transaçoes
     }
 
     public Double getBalance() {
         return balance;
     }
 
-    public void transfer(Account account, double value){
-        balance -= value;
-        account.deposit(value);
+    public void transfer(Account targetAccount, double value){
+        withdraw(value);
+        targetAccount.deposit(value);
         //registrar nas transaçoes
     }
 
     public List<Transaction> getTransactions() {
         return transactions;
     }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
 
     @Override
     public String toString() {

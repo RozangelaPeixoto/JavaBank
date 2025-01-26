@@ -110,7 +110,9 @@ public class App {
     public static void openAccount(Scanner scanner) {
 
         System.out.println();
-        System.out.println("Please respond the following questions to open your account:");
+        System.out.println("======== New Account ========");
+        System.out.println("Please answer the following " +
+                "questions to open your account:");
         System.out.print("Name: ");
         scanner.nextLine();
         String name = scanner.nextLine();
@@ -201,10 +203,11 @@ public class App {
         scanner.nextLine();
         System.out.print("Enter the amount to deposit: ");
         String value = scanner.nextLine();
+
         try{
             accountService.depositValue(value);
             System.out.println("Balance: " + accountService.checkBalance());
-
+            System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }

@@ -4,6 +4,7 @@ import br.com.compass.model.Account;
 import br.com.compass.model.Session;
 import br.com.compass.repository.AccountRepository;
 
+import java.text.DecimalFormat;
 import java.util.Optional;
 
 public class AccountService {
@@ -26,7 +27,7 @@ public class AccountService {
     public Double convertValue(String value) {
         double amount;
         try{
-            amount = Double.parseDouble(value);
+            amount = Math.round(Double.parseDouble(value) * 100.0) / 100.0;
         } catch (NumberFormatException e) {
             return null;
         }
@@ -76,6 +77,9 @@ public class AccountService {
         Account account = Session.getUserAccount();
         if (amount > account.getBalance()) {
             throw new IllegalArgumentException("Insufficient balance.");
+        }
+        if(accNumber.equals(account.getAccNumber())){
+            throw new IllegalArgumentException("Target account and source account cannot be the same.");
         }
         Account targetAccount = findAccountByAccountNumber(accNumber);
         if(targetAccount == null){

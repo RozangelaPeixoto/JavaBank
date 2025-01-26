@@ -4,7 +4,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("1")
+@DiscriminatorValue("BUSINESS")
 public class BusinessAccount extends Account{
 
     public BusinessAccount() { super(); }

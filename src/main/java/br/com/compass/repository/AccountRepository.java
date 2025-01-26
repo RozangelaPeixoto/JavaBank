@@ -1,10 +1,13 @@
 package br.com.compass.repository;
 
 import br.com.compass.model.Account;
-import br.com.compass.model.Session;
+import br.com.compass.model.Transaction;
+import br.com.compass.model.TransactionId;
+import br.com.compass.model.enums.TransactionType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class AccountRepository {
@@ -53,8 +56,17 @@ public class AccountRepository {
         try{
             entityManager.getTransaction().begin();
             Account account = entityManager.find(Account.class, id);
+            Long idT = System.currentTimeMillis();
+            Transaction transaction = new Transaction(
+                    new TransactionId(idT, account.getId()),
+                    TransactionType.DEPOSIT,
+                    amount,
+                    LocalDateTime.now(),
+                    account
+            );
+            entityManager.persist(transaction);
             account.deposit(amount);
-            Session.setUserAccount(account);
+            //Session.setUserAccount(account);
             entityManager.getTransaction().commit();
         }catch(Exception e){
             entityManager.getTransaction().rollback();
@@ -68,8 +80,16 @@ public class AccountRepository {
         try{
             entityManager.getTransaction().begin();
             Account account = entityManager.find(Account.class, id);
+            Long idT = System.currentTimeMillis();
+            Transaction transaction = new Transaction(
+                    new TransactionId(idT, account.getId()),
+                    TransactionType.WITHDRAW,
+                    -amount,
+                    LocalDateTime.now(),
+                    account
+            );
+            entityManager.persist(transaction);
             account.withdraw(amount);
-            Session.setUserAccount(account);
             entityManager.getTransaction().commit();
         }catch(Exception e){
             entityManager.getTransaction().rollback();
@@ -82,7 +102,6 @@ public class AccountRepository {
     public Double balance(Integer id) {
         try{
             Account account = entityManager.find(Account.class, id);
-            Session.setUserAccount(account);
             return account.getBalance();
         }catch(Exception e){
             System.out.println("Unexpected error accessing database");
@@ -93,10 +112,26 @@ public class AccountRepository {
     public void transfer(Integer idTargetAcc, Double amount, Integer id){
         try{
             entityManager.getTransaction().begin();
-            Account account = entityManager.find(Account.class, id);
+            Account sourceAccount = entityManager.find(Account.class, id);
             Account targetAccount = entityManager.find(Account.class, idTargetAcc);
-            account.transfer(targetAccount, amount);
-            Session.setUserAccount(account);
+            Long idT = System.currentTimeMillis();
+            Transaction sourceTransaction = new Transaction(
+                    new TransactionId(idT, sourceAccount.getId()),
+                    TransactionType.TRANSFER,
+                    -amount,
+                    LocalDateTime.now(),
+                    sourceAccount
+            );
+            Transaction targetTransaction = new Transaction(
+                    new TransactionId(idT, targetAccount.getId()),
+                    TransactionType.TRANSFER,
+                    amount,
+                    LocalDateTime.now(),
+                    targetAccount
+            );
+            entityManager.persist(sourceTransaction);
+            entityManager.persist(targetTransaction);
+            sourceAccount.transfer(targetAccount, amount);
             entityManager.getTransaction().commit();
         }catch(Exception e){
             entityManager.getTransaction().rollback();

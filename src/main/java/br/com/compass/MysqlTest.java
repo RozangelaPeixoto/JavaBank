@@ -1,5 +1,6 @@
 package br.com.compass;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,6 +16,7 @@ import br.com.compass.model.Transaction;
 import br.com.compass.model.TransactionId;
 import br.com.compass.model.User;
 import br.com.compass.model.enums.TransactionType;
+import br.com.compass.repository.AccountRepository;
 import br.com.compass.util.Conn;
 
 public class MysqlTest {
@@ -25,40 +27,20 @@ public class MysqlTest {
 
         try {
             EntityManager em = Conn.getEntityManager();
-            em.getTransaction().begin();
+            AccountRepository accountRepository = new AccountRepository(em);
+           // em.getTransaction().begin();
 
             //Query query = em.createNativeQuery("SELECT 1");
             //List result = query.getResultList();
 
-            Account contaOrigem = em.find(Account.class, 4);
-            Account contaDestino = em.find(Account.class, 1);
 
+           /* Account contaOrigem = em.find(Account.class, 1);
 
-            double valorTransferencia = 50.0;
-            contaOrigem.withdraw(valorTransferencia);
-            contaDestino.deposit(valorTransferencia);
+            double valorTransferencia = 20.0;
+            accountRepository.deposit(valorTransferencia, contaOrigem.getId());
 
-            Long idT = System.currentTimeMillis();
-
-            Transaction transacaoOrigem = new Transaction(
-                    new TransactionId(idT, contaOrigem.getId()),
-                    TransactionType.TRANSFER,
-                    valorTransferencia,
-                    LocalDateTime.now(),
-                    contaOrigem);
-
-            Transaction transacaoDestino = new Transaction(
-                    new TransactionId(idT, contaDestino.getId()),
-                    TransactionType.TRANSFER,
-                    valorTransferencia,
-                    LocalDateTime.now(),
-                    contaDestino);
-
-            em.persist(transacaoOrigem);
-            em.persist(transacaoDestino);
-
-            em.merge(contaOrigem);
-            em.merge(contaDestino);
+            System.out.println(contaOrigem);
+            em.merge(contaOrigem);*/
 
             /*
             TypedQuery<Account> query = em.createQuery("SELECT a FROM Account a WHERE a.holder.id = :id", Account.class);
@@ -72,7 +54,7 @@ public class MysqlTest {
                 System.out.println("Erro ao conectar com o banco de dados.");
             }*/
 
-            em.getTransaction().commit();
+            //em.getTransaction().commit();
             
         } catch (Exception e) {
             e.printStackTrace();
