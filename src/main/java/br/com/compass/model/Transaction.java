@@ -4,9 +4,12 @@ import br.com.compass.model.enums.TransactionType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 public class Transaction {
+
+    static DateTimeFormatter formatDateTime = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
 
     @EmbeddedId
     private TransactionId id;
@@ -55,12 +58,9 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return "Transation{" +
-                "id=" + id +
-                ", type=" + type +
-                ", amount=" + amount +
-                ", dateTime=" + dateTime +
-                ", account=" + account +
-                '}';
+        String type = getType() == TransactionType.DEPOSIT ? "DEPOSIT " : String.valueOf(getType());
+        return getDateTime().format(formatDateTime)
+                + " - " + type + " - R$ " +
+                String.format("%.2f", getAmount());
     }
 }

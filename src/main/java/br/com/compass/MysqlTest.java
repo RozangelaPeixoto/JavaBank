@@ -1,23 +1,14 @@
 package br.com.compass;
 
-import java.text.DecimalFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 
-import br.com.compass.model.Account;
 import br.com.compass.model.Transaction;
-import br.com.compass.model.TransactionId;
-import br.com.compass.model.User;
-import br.com.compass.model.enums.TransactionType;
-import br.com.compass.repository.AccountRepository;
-import br.com.compass.util.Conn;
+import br.com.compass.repository.TransactionRepository;
+import br.com.compass.service.TransactionService;
+import br.com.compass.util.Connection;
 
 public class MysqlTest {
 	 
@@ -26,13 +17,20 @@ public class MysqlTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         try {
-            EntityManager em = Conn.getEntityManager();
-            AccountRepository accountRepository = new AccountRepository(em);
+            EntityManager em = Connection.getEntityManager();
+            TransactionRepository TransactionRepository = new TransactionRepository(em);
+            TransactionService TransactionService = new TransactionService(TransactionRepository);
            // em.getTransaction().begin();
-
+            DateTimeFormatter formatDateTime = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
             //Query query = em.createNativeQuery("SELECT 1");
             //List result = query.getResultList();
-
+            System.out.println();
+            System.out.println("======= Bank Statement ======");
+            List<Transaction> transactionList = TransactionService.getBankStatement();
+            for(Transaction trans : transactionList){
+                System.out.println(trans);
+            }
+            System.out.println();
 
            /* Account contaOrigem = em.find(Account.class, 1);
 

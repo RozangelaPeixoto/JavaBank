@@ -4,13 +4,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-public class Conn {
+public class Connection {
 
 	private static final String PERSISTENCE_UNIT_NAME = "java-bank";
     private static EntityManagerFactory factory;
     private static EntityManager entityManager;
  
-    private Conn() {}
+    private Connection() {}
    
     private static void initialize() {
         if (factory == null) {

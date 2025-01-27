@@ -2,28 +2,33 @@ package br.com.compass;
 
 import br.com.compass.model.*;
 import br.com.compass.repository.AccountRepository;
+import br.com.compass.repository.TransactionRepository;
 import br.com.compass.repository.UserRepository;
 import br.com.compass.service.AccountService;
 import br.com.compass.service.SessionService;
+import br.com.compass.service.TransactionService;
 import br.com.compass.service.UserService;
-import br.com.compass.util.Conn;
+import br.com.compass.util.Connection;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Scanner;
 
 public class App {
 
-    static EntityManager entityManager = Conn.getEntityManager();
+    static EntityManager entityManager = Connection.getEntityManager();
     static UserRepository userRepository = new UserRepository(entityManager);
     static AccountRepository accountRepository = new AccountRepository(entityManager);
+    static TransactionRepository TransactionRepository = new TransactionRepository(entityManager);
     static UserService userService = new UserService(userRepository);
     static AccountService accountService = new AccountService(accountRepository);
+    static TransactionService TransactionService = new TransactionService(TransactionRepository);
     static SessionService sessionService = new SessionService(userRepository, accountRepository);
-    static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    
+    static DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
@@ -93,12 +98,10 @@ public class App {
                     transfer(scanner);
                     break;
                 case 5:
-                    // ToDo...
-                    System.out.println("Bank Statement.");
+                    bankStatement();
                     break;
                 case 0:
-                    // ToDo...
-                    System.out.println("Exiting...");
+                    Connection.close();
                     running = false;
                     return;
                 default:
@@ -111,8 +114,6 @@ public class App {
 
         System.out.println();
         System.out.println("======== New Account ========");
-        System.out.println("Please answer the following " +
-                "questions to open your account:");
         System.out.print("Name: ");
         scanner.nextLine();
         String name = scanner.nextLine();
@@ -125,7 +126,7 @@ public class App {
             try {
                 System.out.print("Birth Date (dd/mm/yyyy): ");
                 String date = scanner.nextLine();
-                birthDate = LocalDate.parse(date, formatter);
+                birthDate = LocalDate.parse(date, formatDate);
                 formatValid = true;
             } catch (DateTimeParseException e) {
                 System.out.println("Incorrect format date. Please try again!");
@@ -149,10 +150,10 @@ public class App {
         while(newAccount == null) {
             System.out.print("""
                     Select account type:
-                    1 - Business Account
-                    2 - Checking Account
-                    3 - Salary Account
-                    4 - Savings Account
+                    1. Business Account
+                    2. Checking Account
+                    3. Salary Account
+                    4. Savings Account
                     """);
             System.out.print("Enter the number: ");
             String stringType = scanner.nextLine();
@@ -255,6 +256,17 @@ public class App {
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
+    }
 
+    private static void bankStatement() {
+
+        System.out.println();
+        System.out.println("======= Bank Statement ======");
+        List<Transaction> transactionList = TransactionService.getBankStatement();
+        for(Transaction transaction : transactionList){
+            System.out.println(transaction);
+        }
+        System.out.println("Balance: " + Session.getUserAccount().getBalance());
+        System.out.println();
     }
 }
