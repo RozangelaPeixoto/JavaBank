@@ -18,20 +18,20 @@ public class User implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
     private String name;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String cpf;
     private LocalDate birthDate;
     private String phone;
     private String email;
     private String password;
 
-    @OneToMany(mappedBy = "holder", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Account> accounts;
+    @OneToOne(mappedBy = "holder", cascade = CascadeType.ALL)
+    private Account account;
 
     public User() {
     }
 
-    public User(Integer id, String name, String cpf, LocalDate birthDate, String phone, String email, String password) {
+    public User(Integer id, String name, String cpf, LocalDate birthDate, String phone, String email, String password, Account account) {
         this.id = id;
         this.name = name;
         this.cpf = cpf;
@@ -39,7 +39,7 @@ public class User implements Serializable{
         this.phone = phone;
         this.email = email;
         this.password = password;
-        this.accounts = new ArrayList<>();
+        this.account = account;
     }
 
     public Integer getId() {
@@ -90,7 +90,7 @@ public class User implements Serializable{
         this.password = password;
     }
 
-    public List<Account> getAccounts() { return accounts; }
+    public Account getAccount() { return account; }
 
     @Override
     public String toString() {

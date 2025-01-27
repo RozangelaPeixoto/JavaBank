@@ -8,8 +8,5 @@ import javax.persistence.Entity;
 public class CheckingAccount extends Account{
 
     public CheckingAccount() { super(); }
-    public CheckingAccount(Integer id, User holder) {
-        super(id, holder);
-    }
 
 }

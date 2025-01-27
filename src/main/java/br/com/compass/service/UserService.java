@@ -22,12 +22,13 @@ public class UserService {
             System.out.println("Name is required.\n");
             return false;
         }
-        String regex = "^\\d{11}$";
-        if (user.getCpf() == null || !user.getCpf().matches(regex)) {
+        String regexCPF = "^\\d{11}$";
+        if (user.getCpf() == null || !user.getCpf().matches(regexCPF)) {
             System.out.println("Invalid CPF.\n");
             return false;
         }
-        if (user.getPhone() == null || !user.getPhone().matches(regex)) {
+        String regexPhone = "^\\d+$";
+        if (user.getPhone() == null || !user.getPhone().matches(regexPhone)) {
             System.out.println("Phone is required.\n");
             return false;
         }
@@ -44,10 +45,6 @@ public class UserService {
 
     public User saveUser(User user){
         return userRepository.save(user);
-    }
-
-    public User findUserById(Integer id) {
-        return userRepository.findById(id);
     }
 
     public User findUserByCpf(String cpf) {

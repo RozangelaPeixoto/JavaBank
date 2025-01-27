@@ -1,16 +1,12 @@
 package br.com.compass;
 
 import br.com.compass.model.*;
-import br.com.compass.repository.AccountRepository;
-import br.com.compass.repository.TransactionRepository;
-import br.com.compass.repository.UserRepository;
 import br.com.compass.service.AccountService;
 import br.com.compass.service.SessionService;
 import br.com.compass.service.TransactionService;
 import br.com.compass.service.UserService;
 import br.com.compass.util.Connection;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -19,14 +15,11 @@ import java.util.Scanner;
 
 public class App {
 
-    static EntityManager entityManager = Connection.getEntityManager();
-    static UserRepository userRepository = new UserRepository(entityManager);
-    static AccountRepository accountRepository = new AccountRepository(entityManager);
-    static TransactionRepository TransactionRepository = new TransactionRepository(entityManager);
-    static UserService userService = new UserService(userRepository);
-    static AccountService accountService = new AccountService(accountRepository);
-    static TransactionService TransactionService = new TransactionService(TransactionRepository);
-    static SessionService sessionService = new SessionService(userRepository, accountRepository);
+    static UserService userService = Connection.getUserService();
+    static AccountService accountService = Connection.getAccountService();
+    static TransactionService TransactionService = Connection.getTransactionService();
+    static SessionService sessionService = Connection.getSessionService();
+
     static DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public static void main(String[] args) {
@@ -140,12 +133,6 @@ public class App {
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
-        User newUser = new User(null, name, cpf, birthDate, phone, email, password);
-        boolean isValidUser = userService.isvalideUser(newUser);
-        if(!isValidUser){
-            return;
-        }
-
         Account newAccount = null;
         while(newAccount == null) {
             System.out.print("""
@@ -158,10 +145,10 @@ public class App {
             System.out.print("Enter the number: ");
             String stringType = scanner.nextLine();
             newAccount = switch (stringType) {
-                case "1" -> new BusinessAccount(null, newUser);
-                case "2" -> new CheckingAccount(null, newUser);
-                case "3" -> new SalaryAccount(null, newUser);
-                case "4" -> new SavingsAccount(null, newUser);
+                case "1" -> new BusinessAccount();
+                case "2" -> new CheckingAccount();
+                case "3" -> new SalaryAccount();
+                case "4" -> new SavingsAccount();
                 default -> {
                     System.out.println("Invalid option. Please try again!");
                     System.out.println();
@@ -170,10 +157,12 @@ public class App {
             };
         }
 
-        User recovedUser = userService.saveUser(newUser);
-        accountService.saveAccount(newAccount);
-
-        System.out.println("Your account has been created, use your CPF and password to log in.");
+        User newUser = new User(null, name, cpf, birthDate, phone, email, password, newAccount);
+        if(userService.isvalideUser(newUser)){
+            newAccount.setHolder(newUser);
+            userService.saveUser(newUser);
+            System.out.println("Your account has been created, use your CPF and password to log in.");
+        }
         System.out.println();
     }
 

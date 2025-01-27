@@ -8,8 +8,5 @@ import javax.persistence.Entity;
 public class BusinessAccount extends Account{
 
     public BusinessAccount() { super(); }
-    public BusinessAccount(Integer id, User holder) {
-        super(id, holder);
-    }
 
 }

@@ -25,10 +25,6 @@ public class UserRepository{
         return user;
     }
 
-    public User findById(Integer id) {
-        return entityManager.find(User.class, id);
-    }
-
     public Optional<User> findByCpf(String cpf) {
         try {
             TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u WHERE u.cpf = :cpf", User.class);
@@ -38,5 +34,13 @@ public class UserRepository{
         } catch (Exception e) {
             return Optional.empty();
         }
+    }
+
+    public User login(String cpf, String password){
+        String jpql = "SELECT u FROM User u WHERE u.cpf = :cpf AND u.password = :password";
+        TypedQuery<User> query = entityManager.createQuery(jpql, User.class);
+        query.setParameter("cpf", cpf);
+        query.setParameter("password", password);
+        return query.getSingleResult();
     }
 }

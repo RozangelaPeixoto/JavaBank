@@ -10,8 +10,5 @@ public class SavingsAccount extends Account{
     public SavingsAccount() {
         super();
     }
-    public SavingsAccount(Integer id, User holder) {
-        super(id, holder);
-    }
 
 }

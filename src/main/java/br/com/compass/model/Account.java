@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "id_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 public class Account implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -20,32 +20,37 @@ public class Account implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "acc_number")
+    @Column(name = "number")
     private String accNumber;
     private Double balance;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "id_user", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "user_cpf", referencedColumnName = "cpf", unique = true, nullable = false)
     private User holder;
 
-    @OneToMany(mappedBy = "account")
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Transaction> transactions;
 
-    public Account(Integer id, User holder) {
-        this.id = id;
+    public Account() {
+        this.id = null;
         this.accNumber = null;
         this.balance = 0.0;
-        this.holder = holder;
         this.transactions = new ArrayList<>();
-    }
-
-    public Account() {
-
     }
 
     @PostPersist
     private void generateAccNumber() {
         this.accNumber = String.format("%06d", id);
+    }
+
+    @PrePersist
+    private void prePersist() {
+        if (holder != null) {
+            this.userId = holder.getId();
+        }
     }
 
     public Integer getId() {
@@ -62,10 +67,12 @@ public class Account implements Serializable {
 
     public void deposit(double value){
         balance += value;
+        addTransaction(TransactionType.DEPOSIT, value, null);
     }
 
     public void withdraw(double value){
         balance -= value;
+        addTransaction(TransactionType.WITHDRAW, value, null);
     }
 
     public Double getBalance() {
@@ -75,7 +82,7 @@ public class Account implements Serializable {
     public void transfer(Account targetAccount, double value){
         withdraw(value);
         targetAccount.deposit(value);
-        //registrar nas transaçoes
+        addTransaction(TransactionType.TRANSFER, value, targetAccount);
     }
 
     public List<Transaction> getTransactions() {
@@ -84,6 +91,32 @@ public class Account implements Serializable {
 
     public void setTransactions(List<Transaction> transactions) {
         this.transactions = transactions;
+    }
+
+    public void addTransaction(TransactionType type, Double amount, Account targetAccount){
+        Long idT = System.currentTimeMillis();
+        Transaction transaction = new Transaction(
+                new TransactionId(idT, this.id),
+                type,
+                (type == TransactionType.DEPOSIT ? amount : -amount),
+                LocalDateTime.now(),
+                this
+        );
+        transactions.add(transaction);
+        if(type == TransactionType.TRANSFER){
+            Transaction targetTransaction = new Transaction(
+                    new TransactionId(idT, targetAccount.getId()),
+                    type,
+                    amount,
+                    LocalDateTime.now(),
+                    targetAccount
+            );
+            transactions.add(targetTransaction);
+        }
+    }
+
+    public void setHolder(User holder){
+        this.holder = holder;
     }
 
 

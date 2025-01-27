@@ -8,8 +8,5 @@ import javax.persistence.Entity;
 public class SalaryAccount extends Account{
 
     public SalaryAccount() { super(); }
-    public SalaryAccount(Integer id, User holder) {
-        super(id, holder);
-    }
 
 }

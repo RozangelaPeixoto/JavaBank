@@ -22,7 +22,6 @@ public class Transaction {
     private LocalDateTime dateTime;
 
     @ManyToOne
-    @MapsId("accountId")
     @JoinColumn(name = "id_acc")
     private Account account;
 
