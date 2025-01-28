@@ -43,10 +43,6 @@ public class AccountService {
         accountRepository.withdraw(amount, id);
     }
 
-    public Double checkBalance(Integer id) {
-        return accountRepository.balance(id);
-    }
-
     public void transferValue(String value, String accNumber, Integer id){
         Double amount = convertValue(value);
         if(amount == null){

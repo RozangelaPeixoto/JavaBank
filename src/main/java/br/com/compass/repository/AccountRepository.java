@@ -73,16 +73,6 @@ public class AccountRepository {
 
     }
 
-    public Double balance(Integer id) {
-        try{
-            Account account = entityManager.find(Account.class, id);
-            return account.getBalance();
-        }catch(Exception e){
-            System.out.println("Unexpected error accessing database");
-            throw e;
-        }
-    }
-
     public void transfer(String targetAcc, Double amount, Integer id){
         try{
             entityManager.getTransaction().begin();
