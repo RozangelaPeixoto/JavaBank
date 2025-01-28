@@ -177,7 +177,8 @@ public class App {
         User newUser = new User(null, name, cpf, birthDate, phone, email, newAccount);
         newAccount.setHolder(newUser);
         userService.saveUser(newUser);
-        System.out.println("Your account has been created, use your CPF and password to log in.");
+        System.out.println("Your account has been created!\n" +
+                "Use your cpf and password to log in.");
         System.out.println();
     }
 
@@ -220,6 +221,7 @@ public class App {
             System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
+            System.out.println();
         }
     }
 
@@ -242,6 +244,7 @@ public class App {
             System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
+            System.out.println();
         }
 
     }
@@ -249,7 +252,7 @@ public class App {
     private static void showBalance() {
         System.out.println();
         System.out.println("========== Balance ==========");
-        System.out.println("Balance: R$ " + accountService.checkBalance(loggedAccount.getId()));
+        System.out.println("Balance: R$ " + loggedAccount.getBalance());
         System.out.println();
     }
 
@@ -269,6 +272,7 @@ public class App {
             System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
+            System.out.println();
         }
     }
 
