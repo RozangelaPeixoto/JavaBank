@@ -165,7 +165,10 @@ public class App {
             case "1" -> AccountType.BUSINESS;
             case "3" -> AccountType.SALARY;
             case "4" -> AccountType.SAVINGS;
-            default -> AccountType.CHECKING;
+            default -> {
+                System.out.println("Invalid type, so the default type was selected.");
+                yield AccountType.CHECKING;
+            }
         };
 
         Account newAccount = new Account();
@@ -190,17 +193,14 @@ public class App {
 
         if(accountService.validLogin(cpf,password)){
             loggedAccount = accountService.getAccount(cpf);
-            if(loggedAccount == null){
-                System.out.println("Access denied. Try again!");
-            }else{
-                System.out.println("=============================");
-                System.out.println();
-                System.out.println("Welcome, " + loggedAccount.getHolder().getName());
-                System.out.println("Account Number: " + loggedAccount.getAccNumber());
-                System.out.println("Account Type: " + loggedAccount.getType());
-                bankMenu(scanner);
-            }
+            System.out.println("=============================");
+            System.out.println();
+            System.out.println("Welcome, " + loggedAccount.getHolder().getName());
+            System.out.println("Account Number: " + loggedAccount.getAccNumber());
+            System.out.println("Account Type: " + loggedAccount.getType());
+            bankMenu(scanner);
         }else{
+            System.out.println("Invalid cpf or password! Please try again.");
             System.out.println();
             mainMenu(scanner);
         }

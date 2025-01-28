@@ -11,10 +11,6 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    public Account findAccountByAccountNumber(String accNumber) {
-        return accountRepository.findByAccountNumber(accNumber);
-    }
-
     public Double convertValue(String value) {
         double amount;
         try{
