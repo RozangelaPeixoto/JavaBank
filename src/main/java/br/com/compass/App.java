@@ -1,31 +1,30 @@
 package br.com.compass;
 
 import br.com.compass.model.*;
+import br.com.compass.model.enums.AccountType;
 import br.com.compass.service.AccountService;
-import br.com.compass.service.SessionService;
-import br.com.compass.service.TransactionService;
 import br.com.compass.service.UserService;
 import br.com.compass.util.Connection;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 import java.util.Scanner;
 
 public class App {
 
+    static EntityManager entityManager = Connection.getEntityManager();
     static UserService userService = Connection.getUserService();
     static AccountService accountService = Connection.getAccountService();
-    static TransactionService TransactionService = Connection.getTransactionService();
-    static SessionService sessionService = Connection.getSessionService();
+    static Account loggedAccount = null;
 
     static DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-
+        //Connection.create();
         mainMenu(scanner);
         
         scanner.close();
@@ -130,35 +129,30 @@ public class App {
         String phone = scanner.nextLine();
         System.out.print("Email: ");
         String email = scanner.nextLine();
+
+        Account newAccount = new Account();
         System.out.print("Password: ");
         String password = scanner.nextLine();
+        System.out.print("""
+                Select account type:
+                1. Business Account
+                2. Checking Account
+                3. Salary Account
+                4. Savings Account
+                """);
+        System.out.print("Enter the number: ");
+        String stringType = scanner.nextLine();
+        AccountType type = switch (stringType) {
+            case "1" -> AccountType.BUSINESS;
+            case "3" -> AccountType.SALARY;
+            case "4" -> AccountType.SAVINGS;
+            default -> AccountType.CHECKING;
+        };
 
-        Account newAccount = null;
-        while(newAccount == null) {
-            System.out.print("""
-                    Select account type:
-                    1. Business Account
-                    2. Checking Account
-                    3. Salary Account
-                    4. Savings Account
-                    """);
-            System.out.print("Enter the number: ");
-            String stringType = scanner.nextLine();
-            newAccount = switch (stringType) {
-                case "1" -> new BusinessAccount();
-                case "2" -> new CheckingAccount();
-                case "3" -> new SalaryAccount();
-                case "4" -> new SavingsAccount();
-                default -> {
-                    System.out.println("Invalid option. Please try again!");
-                    System.out.println();
-                    yield null;
-                }
-            };
-        }
-
-        User newUser = new User(null, name, cpf, birthDate, phone, email, password, newAccount);
-        if(userService.isvalideUser(newUser)){
+        newAccount.setPassword(password);
+        newAccount.setType(type);
+        User newUser = new User(null, name, cpf, birthDate, phone, email, newAccount);
+        if(userService.isValideUser(newUser)){
             newAccount.setHolder(newUser);
             userService.saveUser(newUser);
             System.out.println("Your account has been created, use your CPF and password to log in.");
@@ -176,10 +170,18 @@ public class App {
         System.out.print("Enter your password: ");
         String password = scanner.nextLine();
 
-        if(sessionService.validateLogin(cpf,password)){
-            System.out.println();
-            System.out.println("Welcome, " + Session.getLoggedUser().getName());
-            bankMenu(scanner);
+        if(accountService.validLogin(cpf,password)){
+            loggedAccount = accountService.getAccount(cpf);
+            if(loggedAccount == null){
+                System.out.println("Access denied. Try again!");
+            }else{
+                System.out.println("=============================");
+                System.out.println();
+                System.out.println("Welcome, " + loggedAccount.getHolder().getName());
+                System.out.println("Account Number: " + loggedAccount.getAccNumber());
+                System.out.println("Account Type: " + loggedAccount.getType());
+                bankMenu(scanner);
+            }
         }else{
             System.out.println();
             mainMenu(scanner);
@@ -195,8 +197,8 @@ public class App {
         String value = scanner.nextLine();
 
         try{
-            accountService.depositValue(value);
-            System.out.println("Balance: " + accountService.checkBalance());
+            accountService.depositValue(value, loggedAccount.getId());
+            System.out.println("Balance: R$ " + loggedAccount.getBalance());
             System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
@@ -208,12 +210,17 @@ public class App {
         System.out.println();
         System.out.println("========== Withdraw =========");
         scanner.nextLine();
-        System.out.println("Balance: " + accountService.checkBalance());
+        System.out.println("Balance: R$ " + loggedAccount.getBalance());
+        if(loggedAccount.getBalance() == 0){
+            System.out.println("Insufficient balance.");
+            System.out.println();
+            return;
+        }
         System.out.print("Enter the amount to withdraw: ");
         String value = scanner.nextLine();
         try{
-            accountService.withdrawValue(value);
-            System.out.println("Balance: " + accountService.checkBalance());
+            accountService.withdrawValue(value, loggedAccount.getId());
+            System.out.println("Balance: R$ " + loggedAccount.getBalance());
             System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
@@ -224,7 +231,7 @@ public class App {
     private static void showBalance() {
         System.out.println();
         System.out.println("========== Balance ==========");
-        System.out.println("Balance: " + accountService.checkBalance());
+        System.out.println("Balance: R$ " + accountService.checkBalance(loggedAccount.getId()));
         System.out.println();
     }
 
@@ -233,14 +240,14 @@ public class App {
         System.out.println();
         System.out.println("========== Transfer =========");
         scanner.nextLine();
-        System.out.println("Balance: " + accountService.checkBalance());
+        System.out.println("Balance: R$ " + loggedAccount.getBalance());
         System.out.print("Enter the amount to transfer: ");
         String value = scanner.nextLine();
         System.out.print("Enter the account number to transfer: ");
         String accNumber = scanner.nextLine();
         try{
-            accountService.transferValue(value, accNumber);
-            System.out.println("Balance: " + accountService.checkBalance());
+            accountService.transferValue(value, accNumber, loggedAccount.getId());
+            System.out.println("Balance: R$ " + loggedAccount.getBalance());
             System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
@@ -251,11 +258,9 @@ public class App {
 
         System.out.println();
         System.out.println("======= Bank Statement ======");
-        List<Transaction> transactionList = TransactionService.getBankStatement();
-        for(Transaction transaction : transactionList){
+        for(Transaction transaction : loggedAccount.getTransactions()){
             System.out.println(transaction);
         }
-        System.out.println("Balance: " + Session.getUserAccount().getBalance());
         System.out.println();
     }
 }

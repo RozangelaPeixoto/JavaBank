@@ -1,13 +1,9 @@
 package br.com.compass;
 
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import javax.persistence.EntityManager;
 
-import br.com.compass.model.Transaction;
-import br.com.compass.repository.TransactionRepository;
-import br.com.compass.service.TransactionService;
 import br.com.compass.util.Connection;
 
 public class MysqlTest {
@@ -18,19 +14,17 @@ public class MysqlTest {
 
         try {
             EntityManager em = Connection.getEntityManager();
-            TransactionRepository TransactionRepository = new TransactionRepository(em);
-            TransactionService TransactionService = new TransactionService(TransactionRepository);
            // em.getTransaction().begin();
             DateTimeFormatter formatDateTime = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm");
             //Query query = em.createNativeQuery("SELECT 1");
             //List result = query.getResultList();
-            System.out.println();
+            /*System.out.println();
             System.out.println("======= Bank Statement ======");
             List<Transaction> transactionList = TransactionService.getBankStatement();
             for(Transaction trans : transactionList){
                 System.out.println(trans);
             }
-            System.out.println();
+            System.out.println();*/
 
            /* Account contaOrigem = em.find(Account.class, 1);
 

@@ -14,7 +14,7 @@ public class UserRepository{
         this.entityManager = entityManager;
     }
 
-    public User save(User user) {
+    public void save(User user) {
         try{
             entityManager.getTransaction().begin();
             entityManager.persist(user);
@@ -22,25 +22,24 @@ public class UserRepository{
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
-        return user;
     }
 
-    public Optional<User> findByCpf(String cpf) {
+    public User findByCpf(String cpf) {
         try {
             TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u WHERE u.cpf = :cpf", User.class);
             query.setParameter("cpf", cpf);
-            User user = query.getSingleResult();
-            return Optional.of(user);
+            return query.getSingleResult();
         } catch (Exception e) {
-            return Optional.empty();
+            return null;
         }
     }
 
-    public User login(String cpf, String password){
-        String jpql = "SELECT u FROM User u WHERE u.cpf = :cpf AND u.password = :password";
-        TypedQuery<User> query = entityManager.createQuery(jpql, User.class);
+    public boolean existUser(String cpf){
+        String jpql = "SELECT COUNT(u) FROM User u WHERE u.cpf = :cpf";
+        TypedQuery<Long> query = entityManager.createQuery(jpql, Long.class);
         query.setParameter("cpf", cpf);
-        query.setParameter("password", password);
-        return query.getSingleResult();
+        Long count = query.getSingleResult();
+        return count > 0;
     }
+
 }

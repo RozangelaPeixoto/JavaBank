@@ -1,11 +1,7 @@
 package br.com.compass.service;
 
 import br.com.compass.model.Account;
-import br.com.compass.model.Session;
 import br.com.compass.repository.AccountRepository;
-
-import java.text.DecimalFormat;
-import java.util.Optional;
 
 public class AccountService {
 
@@ -14,14 +10,9 @@ public class AccountService {
     public AccountService(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
-/*
-    public Account saveAccount(Account account) {
-        return accountRepository.save(account);
-    }*/
 
     public Account findAccountByAccountNumber(String accNumber) {
-        Optional<Account> accountOptional = accountRepository.findByAccountNumber(accNumber);
-        return accountOptional.orElse(null);
+        return accountRepository.findByAccountNumber(accNumber);
     }
 
     public Double convertValue(String value) {
@@ -34,7 +25,7 @@ public class AccountService {
         return amount;
     }
 
-    public void depositValue(String value) {
+    public void depositValue(String value, Integer id) {
         Double amount = convertValue(value);
         if(amount == null){
             throw new IllegalArgumentException("Invalid number.");
@@ -42,11 +33,10 @@ public class AccountService {
         if(amount <= 0){
             throw new IllegalArgumentException("The amount must be greater than zero.");
         }
-        Account account = Session.getUserAccount();
-        accountRepository.deposit(amount, account.getId());
+        accountRepository.deposit(amount, id);
     }
 
-    public void withdrawValue(String value){
+    public void withdrawValue(String value, Integer id){
         Double amount = convertValue(value);
         if(amount == null){
             throw new IllegalArgumentException("Invalid number.");
@@ -54,19 +44,14 @@ public class AccountService {
         if(amount <= 0){
             throw new IllegalArgumentException("The amount must be greater than zero.");
         }
-        Account account = Session.getUserAccount();
-        if (amount > account.getBalance()) {
-            throw new IllegalArgumentException("Insufficient balance.");
-        }
-        accountRepository.withdraw(amount, account.getId());
+        accountRepository.withdraw(amount, id);
     }
 
-    public Double checkBalance() {
-        Account account = Session.getUserAccount();
-        return accountRepository.balance(account.getId());
+    public Double checkBalance(Integer id) {
+        return accountRepository.balance(id);
     }
 
-    public void transferValue(String value, String accNumber){
+    public void transferValue(String value, String accNumber, Integer id){
         Double amount = convertValue(value);
         if(amount == null){
             throw new IllegalArgumentException("Invalid number.");
@@ -74,18 +59,15 @@ public class AccountService {
         if(amount <= 0){
             throw new IllegalArgumentException("The amount must be greater than zero.");
         }
-        Account account = Session.getUserAccount();
-        if (amount > account.getBalance()) {
-            throw new IllegalArgumentException("Insufficient balance.");
-        }
-        if(accNumber.equals(account.getAccNumber())){
-            throw new IllegalArgumentException("Target account and source account cannot be the same.");
-        }
-        Account targetAccount = findAccountByAccountNumber(accNumber);
-        if(targetAccount == null){
-            throw new IllegalArgumentException("Target account not found.");
-        }
-        accountRepository.transfer(targetAccount.getId(), amount, account.getId());
+        accountRepository.transfer(accNumber, amount, id);
 
+    }
+
+    public boolean validLogin(String cpf, String password){
+        return accountRepository.existAccount(cpf, password);
+    }
+
+    public Account getAccount(String cpf){
+        return accountRepository.findByUserCpf(cpf);
     }
 }

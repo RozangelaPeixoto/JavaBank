@@ -1,5 +1,6 @@
 package br.com.compass.model;
 
+import br.com.compass.model.enums.AccountType;
 import br.com.compass.model.enums.TransactionType;
 
 import javax.persistence.*;
@@ -10,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 public class Account implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -23,13 +22,14 @@ public class Account implements Serializable {
     @Column(name = "number")
     private String accNumber;
     private Double balance;
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private AccountType type;
 
     @OneToOne
     @JoinColumn(name = "user_cpf", referencedColumnName = "cpf", unique = true, nullable = false)
     private User holder;
-
-    @Column(name = "user_id", nullable = false)
-    private Integer userId;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Transaction> transactions;
@@ -44,13 +44,6 @@ public class Account implements Serializable {
     @PostPersist
     private void generateAccNumber() {
         this.accNumber = String.format("%06d", id);
-    }
-
-    @PrePersist
-    private void prePersist() {
-        if (holder != null) {
-            this.userId = holder.getId();
-        }
     }
 
     public Integer getId() {
@@ -70,6 +63,10 @@ public class Account implements Serializable {
         addTransaction(TransactionType.DEPOSIT, value, null);
     }
 
+    public void depositViaTransfer(double value){
+        balance += value;
+    }
+
     public void withdraw(double value){
         balance -= value;
         addTransaction(TransactionType.WITHDRAW, value, null);
@@ -79,9 +76,25 @@ public class Account implements Serializable {
         return balance;
     }
 
+    public AccountType getType() {
+        return type;
+    }
+
+    public void setType(AccountType type) {
+        this.type = type;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public void transfer(Account targetAccount, double value){
-        withdraw(value);
-        targetAccount.deposit(value);
+        balance -= value;
+        targetAccount.depositViaTransfer(value);
         addTransaction(TransactionType.TRANSFER, value, targetAccount);
     }
 

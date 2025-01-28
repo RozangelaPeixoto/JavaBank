@@ -13,37 +13,33 @@ public class AccountRepository {
     public AccountRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
-/*
-    public Account save(Account account) {
-        try{
-            entityManager.getTransaction().begin();
-            entityManager.persist(account);
-            entityManager.getTransaction().commit();
-        }catch(Exception e){
-            System.out.println("Unexpected error while trying to save to database");
-        }
-        return account;
-    }*/
 
-    public Optional<Account> findByUserId(Integer id) {
+    public boolean existAccount(String cpf, String password){
+        String jpql = "SELECT COUNT(a) FROM Account a WHERE a.holder.cpf = :cpf AND a.password = :password";
+        TypedQuery<Long> query = entityManager.createQuery(jpql, Long.class);
+        query.setParameter("cpf", cpf);
+        query.setParameter("password", password);
+        Long count = query.getSingleResult();
+        return count > 0;
+    }
+
+    public Account findByUserCpf(String cpf) {
         try {
-            TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a WHERE a.holder.id = :id", Account.class);
-            query.setParameter("id", id);
-            Account account = query.getSingleResult();
-            return Optional.of(account);
+            TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a WHERE a.holder.cpf = :cpf", Account.class);
+            query.setParameter("cpf", cpf);
+            return query.getSingleResult();
         } catch (Exception e) {
-            return Optional.empty();
+            return null;
         }
     }
 
-    public Optional<Account> findByAccountNumber(String accNumber) {
+    public Account findByAccountNumber(String accNumber) {
         try {
             TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a WHERE a.accNumber = :number", Account.class);
             query.setParameter("number", accNumber);
-            Account account = query.getSingleResult();
-            return Optional.of(account);
+            return query.getSingleResult();
         } catch (Exception e) {
-            return Optional.empty();
+            return null;
         }
     }
 
@@ -56,7 +52,6 @@ public class AccountRepository {
             entityManager.getTransaction().commit();
         }catch(Exception e){
             entityManager.getTransaction().rollback();
-            System.out.println("Unexpected error while trying to save to database");
             throw e;
         }
     }
@@ -66,11 +61,13 @@ public class AccountRepository {
         try{
             entityManager.getTransaction().begin();
             Account account = entityManager.find(Account.class, id);
+            if (amount > account.getBalance()) {
+                throw new IllegalArgumentException("Insufficient balance.");
+            }
             account.withdraw(amount);
             entityManager.getTransaction().commit();
         }catch(Exception e){
             entityManager.getTransaction().rollback();
-            System.out.println("Unexpected error while trying to save to database");
             throw e;
         }
 
@@ -86,16 +83,24 @@ public class AccountRepository {
         }
     }
 
-    public void transfer(Integer idTargetAcc, Double amount, Integer id){
+    public void transfer(String targetAcc, Double amount, Integer id){
         try{
             entityManager.getTransaction().begin();
             Account sourceAccount = entityManager.find(Account.class, id);
-            Account targetAccount = entityManager.find(Account.class, idTargetAcc);
+            if(sourceAccount.getAccNumber().equals(targetAcc)){
+                throw new IllegalArgumentException("Target account and source account cannot be the same.");
+            }
+            Account targetAccount = findByAccountNumber(targetAcc);
+            if(targetAccount == null){
+                throw new IllegalArgumentException("Target account not found.");
+            }
+            if (amount > sourceAccount.getBalance()) {
+                throw new IllegalArgumentException("Insufficient balance.");
+            }
             sourceAccount.transfer(targetAccount, amount);
             entityManager.getTransaction().commit();
         }catch(Exception e){
             entityManager.getTransaction().rollback();
-            System.out.println("Unexpected error while trying to save to database");
             throw e;
         }
     }

@@ -5,6 +5,7 @@ import br.com.compass.model.enums.TransactionType;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Entity
 public class Transaction {
@@ -22,6 +23,7 @@ public class Transaction {
     private LocalDateTime dateTime;
 
     @ManyToOne
+    @MapsId("accountId")
     @JoinColumn(name = "id_acc")
     private Account account;
 
@@ -57,9 +59,9 @@ public class Transaction {
 
     @Override
     public String toString() {
+        Locale.setDefault(Locale.US);
         String type = getType() == TransactionType.DEPOSIT ? "DEPOSIT " : String.valueOf(getType());
-        return getDateTime().format(formatDateTime)
-                + " - " + type + " - R$ " +
-                String.format("%.2f", getAmount());
+        return "-------" + getDateTime().format(formatDateTime) + "--------\n"
+                + type + String.format("%21s", "R$ " + String.format("%.2f", getAmount()));
     }
 }

@@ -13,8 +13,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public boolean isvalideUser(User user) {
-        if(findUserByCpf(user.getCpf()) != null){
+    public boolean isValideUser(User user) {
+        if(userRepository.existUser(user.getCpf())){
             System.out.println("User already has an account.\n");
             return false;
         }
@@ -36,21 +36,16 @@ public class UserService {
             System.out.println("Invalid email.\n");
             return false;
         }
-        if (user.getPassword() == null || user.getPassword().isBlank()) {
-            System.out.println("Password is required.\n");
-            return false;
-        }
         return true;
     }
 
-    public User saveUser(User user){
-        return userRepository.save(user);
+    public void saveUser(User user){
+        userRepository.save(user);
     }
 
     public User findUserByCpf(String cpf) {
-        Optional<User> userOptional = userRepository.findByCpf(cpf);
+         return userRepository.findByCpf(cpf);
 
-        return userOptional.orElse(null);
     }
 
 }
