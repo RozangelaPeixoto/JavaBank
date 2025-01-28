@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 public class App {
 
@@ -104,13 +105,23 @@ public class App {
 
     public static void openAccount(Scanner scanner) {
 
+        Predicate<String> isStringValid = pName -> pName == null || pName.isBlank();
+        Predicate<String> isCpfValid = pCpf -> pCpf == null || !pCpf.matches("^\\d{11}$");
+        Predicate<String> isPhoneValid = pPhone -> pPhone == null || !pPhone.matches("^\\d+$");
+        Predicate<String> isEmailValid = pEmail -> pEmail == null || !pEmail.contains("@");
         System.out.println();
         System.out.println("======== New Account ========");
         System.out.print("Name: ");
         scanner.nextLine();
-        String name = scanner.nextLine();
+        String name = userService.validInput(scanner, scanner.nextLine(), "Name is required.\nName: ", isStringValid);
         System.out.print("CPF: ");
-        String cpf = scanner.nextLine();
+        String cpf = userService.validInput(scanner, scanner.nextLine(), "Invalid CPF.\nCPF: ", isCpfValid);
+
+        if(userService.userAlreadyHaveAccount(cpf)){
+            System.out.println("User already has an account!");
+            System.out.println();
+            return;
+        }
 
         LocalDate birthDate = null;
         boolean formatValid = false;
@@ -126,13 +137,21 @@ public class App {
         }
 
         System.out.print("Phone number: ");
-        String phone = scanner.nextLine();
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
+        String phone = userService.validInput(scanner, scanner.nextLine(), "Invalid phone number.\nPhone: ", isPhoneValid);
 
-        Account newAccount = new Account();
+        System.out.print("Email: ");
+        String email = userService.validInput(scanner, scanner.nextLine(), "Invalid email.\nEmail: ", isEmailValid);
+
+        System.out.print("""
+                Password Requirements:
+                8 characters
+                1 uppercase letter
+                1 lowercase letter
+                1 number
+                1 special character
+                """);
         System.out.print("Password: ");
-        String password = scanner.nextLine();
+        String password = userService.validatePassword(scanner, scanner.nextLine(), "Invalid password.\nPassword: ");
         System.out.print("""
                 Select account type:
                 1. Business Account
@@ -149,14 +168,13 @@ public class App {
             default -> AccountType.CHECKING;
         };
 
+        Account newAccount = new Account();
         newAccount.setPassword(password);
         newAccount.setType(type);
         User newUser = new User(null, name, cpf, birthDate, phone, email, newAccount);
-        if(userService.isValideUser(newUser)){
-            newAccount.setHolder(newUser);
-            userService.saveUser(newUser);
-            System.out.println("Your account has been created, use your CPF and password to log in.");
-        }
+        newAccount.setHolder(newUser);
+        userService.saveUser(newUser);
+        System.out.println("Your account has been created, use your CPF and password to log in.");
         System.out.println();
     }
 
