@@ -267,7 +267,7 @@ public class App {
         System.out.print("Enter the account number to transfer: ");
         String accNumber = scanner.nextLine();
         try{
-            accountService.transferValue(value, accNumber, loggedAccount.getId());
+            accountService.transferValue(value, accNumber, loggedAccount);
             System.out.println("Balance: R$ " + loggedAccount.getBalance());
             System.out.println();
         } catch (IllegalArgumentException e) {

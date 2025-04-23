@@ -73,20 +73,11 @@ public class AccountRepository {
 
     }
 
-    public void transfer(String targetAcc, Double amount, Integer id){
+    public void transfer(Integer targetAccId, Double amount, Integer id){
         try{
             entityManager.getTransaction().begin();
             Account sourceAccount = entityManager.find(Account.class, id);
-            if(sourceAccount.getAccNumber().equals(targetAcc)){
-                throw new IllegalArgumentException("Target account and source account cannot be the same.");
-            }
-            Account targetAccount = findByAccountNumber(targetAcc);
-            if(targetAccount == null){
-                throw new IllegalArgumentException("Target account not found.");
-            }
-            if (amount > sourceAccount.getBalance()) {
-                throw new IllegalArgumentException("Insufficient balance.");
-            }
+            Account targetAccount = entityManager.find(Account.class, targetAccId);
             sourceAccount.transfer(targetAccount, amount);
             entityManager.getTransaction().commit();
         }catch(Exception e){

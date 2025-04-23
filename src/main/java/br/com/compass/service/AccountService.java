@@ -43,7 +43,7 @@ public class AccountService {
         accountRepository.withdraw(amount, id);
     }
 
-    public void transferValue(String value, String accNumber, Integer id){
+    public void transferValue(String value, String accNumber, Account account){
         Double amount = convertValue(value);
         if(amount == null){
             throw new IllegalArgumentException("Invalid number.");
@@ -51,7 +51,17 @@ public class AccountService {
         if(amount <= 0){
             throw new IllegalArgumentException("The amount must be greater than zero.");
         }
-        accountRepository.transfer(accNumber, amount, id);
+        if(account.getAccNumber().equals(accNumber)){
+            throw new IllegalArgumentException("Target account and source account cannot be the same.");
+        }
+        if (amount > account.getBalance()) {
+            throw new IllegalArgumentException("Insufficient balance.");
+        }
+        Account targetAccount = accountRepository.findByAccountNumber(accNumber);
+        if(targetAccount == null){
+            throw new IllegalArgumentException("Target account not found.");
+        }
+        accountRepository.transfer(targetAccount.getId(), amount, account.getId());
 
     }
 
