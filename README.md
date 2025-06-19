@@ -16,27 +16,27 @@ O backend é desenvolvido em Java, organizado em camadas nos pacotes `model`, `s
 ---
 
 ## 📂 Estrutura do Projeto
-JavaBank/
-├── src/main/java/br/com/compass/
-│   ├── model
-│   │   ├── enums
-│   │   │   ├── AccountType — Enum que representa o tipo de conta (CHECKING, SAVINGS, SALARY, BUSINESS)
-│   │   │   └── TransactionType — Enum que representa o tipo de transação (DEPOSIT, WITHDRAW, TRANSFER)
-│   │   ├── Account.java — Modelo de entidade que representa uma conta bancária
-│   │   ├── Transaction.java — Modelo de entidade que representa uma transação financeira
-│   │   ├── TransactionId.java — Classe de chave composta usada pela entidade Transaction
-│   │   └── User.java — Modelo de entidade que representa um usuário do sistema
-│   ├── repository
-│   │   ├── AccountRepository.java — Interface de repositório para operações com contas no banco de dados
-│   │   ├── UserRepository.java — Interface de repositório para operações com usuários no banco de dados
-│   ├── service
-│   │   ├── AccountService.java — Classe de serviço que contém as regras de negócio relacionadas às contas
-│   │   ├── UserService.java — Classe de serviço responsável pela lógica de criação e gerenciamento de usuários
-│   ├── util
-│   │   ├── Connection.java — Classe utilitária para gerenciamento da conexão com o banco de dados
-│   └── App.java — Classe principal com menu interativo para execução da aplicação no terminal
-├── pom.xml — Gerenciador de dependências e build do Maven
-└── README.md — Este documento
+JavaBank/  
+├── src/main/java/br/com/compass/  
+│   ├── model  
+│   │   ├── enums  
+│   │   │   ├── AccountType — Enum que representa o tipo de conta (CHECKING, SAVINGS, SALARY, BUSINESS)  
+│   │   │   └── TransactionType — Enum que representa o tipo de transação (DEPOSIT, WITHDRAW, TRANSFER)  
+│   │   ├── Account.java — Modelo de entidade que representa uma conta bancária  
+│   │   ├── Transaction.java — Modelo de entidade que representa uma transação financeira  
+│   │   ├── TransactionId.java — Classe de chave composta usada pela entidade Transaction  
+│   │   └── User.java — Modelo de entidade que representa um usuário do sistema  
+│   ├── repository  
+│   │   ├── AccountRepository.java — Interface de repositório para operações com contas no banco de dados  
+│   │   ├── UserRepository.java — Interface de repositório para operações com usuários no banco de dados  
+│   ├── service  
+│   │   ├── AccountService.java — Classe de serviço que contém as regras de negócio relacionadas às contas  
+│   │   ├── UserService.java — Classe de serviço responsável pela lógica de criação e gerenciamento de usuários  
+│   ├── util  
+│   │   ├── Connection.java — Classe utilitária para gerenciamento da conexão com o banco de dados  
+│   └── App.java — Classe principal com menu interativo para execução da aplicação no terminal  
+├── pom.xml — Gerenciador de dependências e build do Maven  
+└── README.md — Este documento  
 
 ---
 
